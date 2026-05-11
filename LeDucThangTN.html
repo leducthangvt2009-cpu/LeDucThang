@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ôn tập Lịch sử 11</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f3f0ea;
+    padding:20px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    margin-bottom:30px;
+    box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+
+.title{
+    display:inline-block;
+    background:#efe2c3;
+    color:#b87900;
+    padding:10px 16px;
+    border-radius:14px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.question{
+    margin-bottom:25px;
+}
+
+.question h3{
+    line-height:1.6;
+}
+
+label{
+    display:block;
+    margin:8px 0;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+label:hover{
+    background:#f0f0f0;
+}
+
+.quote{
+    background:#f8f4ec;
+    padding:18px;
+    border-radius:10px;
+    font-style:italic;
+    color:#8d671f;
+    line-height:1.7;
+    margin-bottom:20px;
+}
+
+.answer-row{
+    background:#faf8f4;
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:15px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.answer-text{
+    flex:1;
+    line-height:1.7;
+    font-size:17px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+}
+
+.buttons label{
+    cursor:pointer;
+}
+
+.buttons input{
+    display:none;
+}
+
+.btn{
+    border:2px solid #ccc;
+    background:white;
+    padding:10px 20px;
+    border-radius:30px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.buttons input:checked + .btn{
+    background:#d9ecff;
+    border-color:#4a90e2;
+}
+
+.correct{
+    background:#b7ffb7 !important;
+    border-color:green !important;
+}
+
+.wrong{
+    background:#ffb7b7 !important;
+    border-color:red !important;
+}
+
+button{
+    display:block;
+    margin:30px auto;
+    padding:15px 35px;
+    border:none;
+    border-radius:12px;
+    background:#007bff;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+#result{
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+    color:#d60000;
+    margin-top:30px;
+}
+
+#timer{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    color:#b30000;
+    margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="timer">
+45:00
+</div>
+
+<div class="card">
+
+<div class="title">
+PHẦN I - TRẮC NGHIỆM
+</div>
+
+<form id="mcqForm"></form>
+
+</div>
+
+<div class="card">
+
+<div class="title">
+PHẦN II - ĐÚNG / SAI
+</div>
+
+<div id="tfContainer"></div>
+
+</div>
+
+<button onclick="submitQuiz()">
+Nộp bài
+</button>
+
+<button onclick="location.reload()">
+Làm lại đề
+</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+function shuffle(array){
+
+for(let i=array.length-1;i>0;i--){
+
+let j=Math.floor(Math.random()*(i+1));
+
+[array[i],array[j]]=[array[j],array[i]];
+
+}
+
+}
+
+const mcq = [
+
+{
+question:`Câu 1.Nửa sau thế kỷ XIX, Xiêm tiến hành công cuộc cải cách trong hoàn cảnh nào?`,
+answers:[
+{text:`A. Khủng hoảng kinh tế, xã hội, chính trị nghiêm trọng.`,correct:false},
+{text:`B. Nguy cơ bị thực dân phương Tây biến thành thuộc địa.`,correct:true},
+{text:`C. Những mâu thuẫn xã hội, giai cấp diễn ra hết sức gay gắt.`,correct:false}
+]
+},
+
+{
+question:`Câu 2.Sau khi giành độc lập, tình hình kinh tế các nước Đông Nam Á như thế nào?`,
+answers:[
+{text:`A. Phát triển rất mạnh mẽ.`,correct:false},
+{text:`B. Nghèo nàn và lạc hậu.`,correct:true},
+{text:`C. Công nghiệp phát triển.`,correct:false},
+{text:`D. Phát triển thương nghiệp.`,correct:false}
+]
+},
+
+{
+question:`Câu 3.Sau khi giành độc lập, quá trình tái thiết đất nước của các quốc gia Đông Nam Á đã đạt kết quả nào sau đây?`,
+answers:[
+{text:`A. Phát triển rất nhanh.`,correct:true},
+{text:`B. Lệ thuộc phương Tây.`,correct:false},
+{text:`C. Kinh tế nhiều hạn chế.`,correct:false},
+{text:`D. Cơ sở hạ tầng còn thấp.`,correct:false}
+]
+},
+
+{
+question:`Câu 4.Cuộc kháng chiến nào trong lịch sử Việt Nam đã mở ra thời kỳ độc lập tự chủ lâu dài cho dân tộc?`,
+answers:[
+{text:`A. Kháng chiến chống quân Nam Hán năm 938.`,correct:true},
+{text:`B. Kháng chiến chống Tống thời Tiền Lê năm 981.`,correct:false},
+{text:`C. Kháng chiến chống Tống thời Lý năm 1077.`,correct:false},
+{text:`D. Khởi nghĩa Lam Sơn từ năm 1417 đến 1427.`,correct:false}
+]
+},
+
+{
+question:`Câu 5.Trong lịch sử chống giặc ngoại xâm của dân tộc Việt Nam đến trước Cách mạng tháng Tám năm 1945, cuộc kháng chiến nào sau đây không giành được thắng lợi?`,
+answers:[
+{text:`A. Kháng chiến chống quân Minh xâm lược của nhà Hồ.`,correct:true},
+{text:`B. Kháng chiến chống quân Thanh của Quang Trung.`,correct:false},
+{text:`C. Kháng chiến chống quân Mông - Nguyên của nhà Trần.`,correct:false},
+{text:`D. Kháng chiến chống quân Nam Hán của Ngô Quyền.`,correct:false}
+]
+},
+
+{
+question:`Câu 6.
+“Đời vua Thái Tổ, Thái Tông
+Thóc lúa đầy đồng, trâu chẳng buồn ăn”
+Hai câu thơ trên thể hiện điều gì?`,
+answers:[
+{text:`A. Nông nghiệp phát triển thịnh đạt.`,correct:true},
+{text:`B. Quyền lợi của nhân dân được bảo vệ.`,correct:false},
+{text:`C. Tình hình chính trị ổn định, ít mâu thuẫn.`,correct:false},
+{text:`D. Quyền lực tập trung vào tay nhà vua.`,correct:false}
+]
+},
+
+{
+question:`Câu 7.So với pháp luật nước ta hiện nay, bộ luật Hồng Đức có điểm tương đồng là gì?`,
+answers:[
+{text:`A. Bảo vệ phụ nữ, trẻ em.`,correct:true},
+{text:`B. Cấm giết mổ trâu, bò.`,correct:false},
+{text:`C. Bảo vệ giai cấp thống trị.`,correct:false},
+{text:`D. Các hình phạt nặng nề.`,correct:false}
+]
+},
+
+{
+question:`Câu 8.Cuộc cải cách của vua Minh Mạng (thế kỉ XIX) có ý nghĩa quan trọng nào sau đây?`,
+answers:[
+{text:`A. Xóa bỏ tình trạng “bế quan tỏa cảng” của đất nước.`,correct:false},
+{text:`B. Xóa bỏ tình trạng cát cứ của các thế lực phong kiến.`,correct:false},
+{text:`C. Đặt cơ sở cho sự phân chia hành chính hiện nay.`,correct:true},
+{text:`D. Hoàn thành thống nhất đất nước về mặt lãnh thổ.`,correct:false}
+]
+},
+
+{
+question:`Câu 9.Cuộc cải cách của vua Minh Mạng (nửa đầu thế kỉ XIX) và cuộc cải cách của vua Lê Thánh Tông (thế kỉ XV) có điểm giống nhau nào sau đây?`,
+answers:[
+{text:`A. Nâng cao vai trò quản lí của chính quyền ở trung ương.`,correct:true},
+{text:`B. Khuyến khích, tạo điều kiện cho ngoại thương phát triển.`,correct:false},
+{text:`C. Ưu tiên cho sự nghiệp thống nhất đất nước về lãnh thổ.`,correct:false},
+{text:`D. Chú trọng phát triển kinh tế, xã hội theo hướng hiện đại.`,correct:false}
+]
+},
+
+{
+question:`Câu 10.Cuộc cải cách của vua Minh Mạng (nửa đầu thế kỉ XIX) và cuộc cải cách của vua Lê Thánh Tông (thế kỉ XV) có điểm giống nhau nào sau đây?`,
+answers:[
+{text:`A. Khuyến khích, tạo điều kiện cho ngoại thương phát triển.`,correct:false},
+{text:`B. Ưu tiên cho sự nghiệp thống nhất đất nước về lãnh thổ.`,correct:false},
+{text:`C. Chú trọng phát triển kinh tế, xã hội theo hướng hiện đại.`,correct:false},
+{text:`D. Tăng cường và tập trung quyền lực trong tay hoàng đế.`,correct:true}
+]
+},
+
+{
+question:`Câu 11.Cuộc cải cách của vua Minh Mạng (nửa đầu thế kỉ XIX) và cuộc cải cách của vua Lê Thánh Tông (thế kỉ XV) có điểm giống nhau nào sau đây?`,
+answers:[
+{text:`A. Khuyến khích, tạo điều kiện cho ngoại thương phát triển.`,correct:false},
+{text:`B. Tác động đến sự phát triển của đất nước trên nhiều mặt.`,correct:true},
+{text:`C. Ưu tiên cho sự nghiệp thống nhất đất nước về lãnh thổ.`,correct:false},
+{text:`D. Chú trọng phát triển kinh tế, xã hội theo hướng hiện đại.`,correct:false}
+]
+},
+
+{
+question:`Câu 12.Từ những chính sách cải cách của vua Lê Thánh Tông thế kỷ XV, hiện nay có thể ra bài học kinh nghiệm gì để xây dựng vào bảo vệ Tổ quốc?`,
+answers:[
+{text:`A. Coi trọng giáo dục để đào tạo nhân tài cho đất nước.`,correct:true},
+{text:`B. Tập trung quyền lực vào tay người đứng đầu đất nước.`,correct:false},
+{text:`C. Thường xuyên tổ chức các cuộc duyệt binh, tập trận.`,correct:false},
+{text:`D. Đưa thanh nhiên sang các nước để học tập và rèn luyện.`,correct:false}
+]
+},
+
+{
+question:`Câu 13.Nhận định Lê Thánh Tông là “minh quân, hùng tài đại lược” là đúng hay sai, Vì sao?`,
+answers:[
+{text:`A. Đúng, vì những thành tựu mà đất nước ta đạt được dưới sự cai trị của ông.`,correct:true},
+{text:`B. Đúng, vì vua Lê Thánh Tông đã giải oan cho Nguyễn Trãi sau khi lên ngôi.`,correct:false},
+{text:`C. Sai, vì trong thời gian ở ngôi vua ông cũng đã phạm nhiều sai lầm rất lớn.`,correct:false},
+{text:`D. Sai, vì sau khi Ông mất không lâu, nhà Lê sơ rơi vào tình trạng khủng hoảng.`,correct:false}
+]
+},
+
+{
+question:`Câu 14.Việc tìm hiểu và đánh giá đúng những cải cách của Lê Thánh Tông giúp học sinh ngày nay hình thành thái độ nào sau đây?`,
+answers:[
+{text:`A. Tự hào và trân trọng những giá trị cải cách tiến bộ trong lịch sử dân tộc.`,correct:true},
+{text:`B. Cho rằng các cải cách trong lịch sử không còn giá trị hiện nay.`,correct:false},
+{text:`C. Chỉ quan tâm đến các thành tựu quân sự của đất nước.`,correct:false},
+{text:`D. Phủ nhận vai trò của các vị vua trong lịch sử Việt Nam.`,correct:false}
+]
+},
+
+{
+question:`Câu 15.Từ những cải cách của Lê Thánh Tông ở thế kỷ XV, bài học nào sau đây có ý nghĩa thiết thực nhất trong việc xây dựng bộ máy nhà nước hiện nay?`,
+answers:[
+{text:`A. Tăng cường quyền lực tuyệt đối cho người đứng đầu.`,correct:false},
+{text:`B. Thiết lập cơ chế kiểm soát quyền lực giữa các cơ quan nhà nước.`,correct:true},
+{text:`C. Duy trì chế độ thi cử Nho học như thời phong kiến.`,correct:false},
+{text:`D. Tập trung phát triển quân sự thay vì kinh tế.`,correct:false}
+]
+},
+
+{
+question:`Câu 16.Một trong những đóng góp to lớn của vua Minh Mạng (1820 – 1840) đối với lịch sử dân tộc Việt Nam là gì?`,
+answers:[
+{text:`A. Bảo vệ chủ quyền đối với quần đảo Hoàng Sa và Trường Sa.`,correct:true},
+{text:`B. Đã xây dựng Việt Nam thành cường quốc số một ở Châu Á.`,correct:false},
+{text:`C. Tạo điều kiện cho giáo dục Nho học và chữ Nôm phát triển.`,correct:false},
+{text:`D. Đã cho khôi phục và xây dựng mới hoàng thành Thăng Long.`,correct:false}
+]
+},
+
+{
+question:`Câu 17.Một trong những bài học rút ra từ cuộc cải cách của vua Minh Mạng (nửa đầu thế kỉ XIX) còn giá trị đến ngày nay là`,
+answers:[
+{text:`A. xây dựng đạo đức công vụ cho đội ngũ cán bộ trong bộ máy quản lý nhà nước.`,correct:true},
+{text:`B. tăng cường sức mạnh quân sự đối đầu với âm mưu của các nước Đông Nam Á.`,correct:false},
+{text:`C. củng cố tính chuyên chế của nhà nước, đàn áp các thế lực có tư tưởng chống đối.`,correct:false},
+{text:`D. tăng cường quyền lực cho chính quyền trung ương để hạn chế cát cứ địa phương.`,correct:false}
+]
+},
+
+{
+question:`Câu 18.Cuộc cải cách của vua Minh Mạng (nửa đầu thế kỉ XIX) và cuộc cải cách của vua Lê Thánh Tông (thế kỉ XV) có điểm khác biệt nào sau đây?`,
+answers:[
+{text:`A. Thành lập lục Bộ để giúp việc cho nhà vua.`,correct:false},
+{text:`B. Tăng cường quyền lực tuyệt đối của nhà vua.`,correct:false},
+{text:`C. Củng cố chế độ quân chủ chuyên chế tập quyền.`,correct:false},
+{text:`D. Chia cả nước thành 30 tỉnh và phủ Thừa Thiên.`,correct:true}
+]
+},
+
+{
+question:`Câu 19.Biển Đông có vị trí chiến lược quan trọng trong giao thông hàng hải quốc tế vì`,
+answers:[
+{text:`A. là tuyến đường biển duy nhất trên thế giới.`,correct:false},
+{text:`B. tập trung nhiều tuyến đường biển chiến lược.`,correct:true},
+{text:`C. ít có sự hoạt động của áp thất nhiệt đới, bão.`,correct:false},
+{text:`D. bị nhiều cường quốc lớn chi phối, khống chế.`,correct:false}
+]
+},
+
+{
+question:`Câu 20.Nội dung nào sau đây phản ánh đúng về tầm quan trọng chiến lược của Biển Đông đối với sự phát triển kinh tế Việt Nam?`,
+answers:[
+{text:`A. Hệ thống đảo, quần đảo trên Biển Đông chỉ thuận lợi để đầu tư và phát triển du lịch.`,correct:false},
+{text:`B. Việt Nam được đánh giá là quốc gia có lợi thế và tiềm năng to lớn về tài nguyên biển.`,correct:true},
+{text:`C. Vùng biển rộng lớn với nhiều hòn đảo là không gian trọng yếu để phát triển văn hóa.`,correct:false},
+{text:`D. Biển đảo là nguồn cung cấp lương thực chủ yếu cho cuộc sống của nhân dân Việt Nam`,correct:false}
+]
+}
+
+];
+
+const tfQuestions = [
+
+{
+id:21,
+quote:`“Cuộc khởi nghĩa Tây Sơn là cuộc nông dân khởi nghĩa duy nhất trong thời phong kiến Việt Nam đã đánh bại kẻ thù trong và ngoài nước (...). Phong trào đã lật đổ nền thống trị của các tập đoàn phong kiến phản động, kết thúc tình trạng phân chia đất nước kéo dài trên hai thế kỉ, đánh tan quân xâm lược Xiêm và Thanh, đặt cơ sở cho công cuộc khôi phục quốc gia thống nhất sau này.”`,
+source:"(Phan Huy Lê, Tìm hiểu thêm về phong trào nông dân Tây Sơn)",
+answers:[
+{text:"a) Khởi nghĩa Tây Sơn là cuộc khởi nghĩa nông dân duy nhất trong thời phong kiến Việt Nam.",correct:false},
+{text:"b) Khởi nghĩa Tây Sơn đánh tan quân Xiêm và quân Tống.",correct:false},
+{text:"c) Khởi nghĩa Tây Sơn đã không lật đổ được nền thống trị của các tập đoàn phong kiến phản động.",correct:false},
+{text:"d) Chiến thắng của cuộc khởi nghĩa Tây Sơn đã kết thúc tình trạng phân chia đất nước.",correct:true}
+]
+},
+
+{
+id:22,
+quote:`“Năm 1477, Lê Thánh Tông ban hành chế độ quân điền, chia ruộng đất công làng xã cho người dân, từ quan tam phẩm trở xuống đến binh lính, dân đinh, cư dân trong thôn xã theo tỉ lệ. Chính sách quân điền phủ định quyền chi phối ruộng đất công của làng xã theo tục lệ, buộc làng xã phải tuân thủ những nguyên tắc quy định về phân chia và hưởng thụ bộ phận ruộng đất công theo quy định của nhà nước. Trên nguyên tắc, ruộng đất công làng xã không được đem mua bán, chuyển nhượng, quyền đó thuộc về vua. Vua trở thành người chủ lớn nhất trong cả nước và nông dân làng xã trở thành tá điền của nhà nước, làng xã quản lí ruộng đất cho nhà nước trung ương và nhà vua”`,
+source:"(Phan Huy Lê, Lịch sử Việt Nam, tập 2)",
+answers:[
+{text:"a) Chế độ quân điền mà vua Lê Thánh Tông ban hành có điểm tích cực là đảm bảo cho người dân có ruộng đất để cày cấy, canh tác.",correct:true},
+{text:"b) Với chính sách quân điền, nhà nước Lê sơ trở thành thế lực địa chủ tối cao, làng xã biến thành đơn vị thay mặt nhà nước quản lý ruộng đất.",correct:true},
+{text:"c) Đoạn trích cung cấp thông tin về một số biện pháp cải cách của vua Lê Thánh Tông trên lĩnh vực kinh tế.",correct:true},
+{text:"d) Trong bối cảnh lịch sử lúc bấy giờ, chính sách quân điền gây ra nhiều hệ quả tiêu cực hơn là tích cực.",correct:false}
+]
+},
+
+{
+id:23,
+quote:`“Năm 1397, Hồ Quý Ly cho xây dựng thành Tây Đô (thuộc Thanh Hoá ngày nay) rồi ép vua Trần dời đô về đây. Phía ngoài thành là hệ thống hào quy mô lớn kết hợp luỹ tre gai dày đặc. Năm 1402, nhà Hồ đắp sửa đường sá từ thành Tây Đô đến Hoa Châu (Thừa Thiên Huế và phía bắc Quảng Nam ngày nay). Năm 1405, nhà Hồ cho quân đóng cọc gỗ lớn ở cửa biển và những nơi xung yếu trên sông để phòng giặc, xây dựng hệ thống phòng thủ dài hàng trăm ki-lô-mét.”`,
+source:"(SGK Lịch sử 11, Bộ Cánh Diều, trang 64)",
+answers:[
+{text:"a) Tư liệu đề cập đến nội dung trong cải cách về mặt quân sự của Hồ Quý Ly.",correct:true},
+{text:"b) Cải cách đã góp phần tăng cường hệ thống phòng thủ và sức mạnh quân sự.",correct:true},
+{text:"c) Trong cải cách, Hồ Quý Ly chú trọng yếu tố sức mạnh chiến tranh nhân dân.",correct:false},
+{text:"d) Nhờ cải cách quân sự, nhà Hồ đã đủ tiềm lực để kháng chiến chống Minh.",correct:false}
+]
+},
+
+{
+id:24,
+quote:`“Về quân sự: quần đảo Hoàng Sa và quần đảo Trường Sa có vị trí chiến lược, có thể dùng để kiểm soát các tuyến hàng hải qua lại Biển Đông, cũng như có vị thế phòng thủ chắc chắn thông qua sự liên kết giữa các đảo, cụm đảo, tuyến đảo ở hai quần đảo.”`,
+source:"(SGK Lịch sử 11, Bộ Chân trời sáng tạo, trang 81)",
+answers:[
+{text:"a) Tư liệu nói về vị trí chiến lược của Hoàng Sa và Trường Sa về quân sự.",correct:true},
+{text:"b) Việt Nam đã sử dụng hai quần đảo để kiểm soát và khống chế Biển Đông.",correct:false},
+{text:"c) Hoàng Sa và Trường Sa là tuyến phòng thủ từ sớm từ xa của Việt Nam.",correct:true},
+{text:"d) Từ sau năm 1975, Việt Nam hoàn toàn kiểm soát và làm chủ hai quần đảo.",correct:false}
+]
+},
+
+{
+id:25,
+quote:`“Hiệu quả cải cách hành chính của Minh Mạng là đã tăng cường được tính thống nhất quốc gia, củng cố được vương triều Nguyễn, phần nào ổn định được xã hội sau hàng thế kỉ chiến tranh, vừa chống ngoại xâm vừa nội chiến liên miên. Nhưng bị hạn chế và không tạo nên được sức mạnh kinh tế, chính trị, văn hóa, xã hội và quan hệ quốc tế tốt đẹp, có khả năng kiềm chế được ngoại xâm”`,
+source:"(Văn Tạo, Mười cuộc cải cách, đổi mới lớn trong lịch sử Việt Nam)",
+answers:[
+{text:"a) Đoạn tư liệu phản ánh tác động tích cực và hạn chế trong cải cách của vua Minh Mạng trên lĩnh vực hành chính.",correct:true},
+{text:"b) Một trong những hiệu quả tích cực trong cải cách của vua Minh Mạng là tạo dựng được mối quan hệ tốt đẹp với bên ngoài, củng cố khối đại đoàn kết dân tộc.",correct:false},
+{text:"c) Cải cách của vua Minh Mạng đã thống nhất các đơn vị hành chính địa phương trong cả nước, thông qua đó hoàn thành thống nhất đất nước về mặt hành chính.",correct:true},
+{text:"d) Cải cách của vua Minh Mạng đã góp phần ổn định tình hình đất nước nhưng không tạo được động lực thúc đẩy sự phát triển mạnh mẽ của kinh tế, chính trị đất nước.",correct:true}
+]
+},
+
+{
+id:26,
+quote:`“[Năm 1488] Tháng 9, xuống chiếu rằng: Từ nay, các quan phủ, huyện, châu xét đặt xã trưởng, hễ là anh em ruột, anh em con chủ con bác và bác cháu, cậu cháu với nhau thì cho một người làm xã trưởng, không được cả hai cùng làm để trừ mối tệ bè phái hùa nhau”`,
+source:"(SGK Lịch sử 11, Bộ Cánh Diều, trang 69)",
+answers:[
+{text:"a) Tư liệu đang nói về bản chiếu chỉ được vua Lê Thái Tổ ban hành năm 1488.",correct:false},
+{text:"b) Mục đích của bản chiếu là để ngăn chặn việc kết bè, kết phái làm hại nhân dân.",correct:true},
+{text:"c) Đây là một trong những cơ sở để nhà Nguyễn sau này đặt ra chế độ “hồi tị”.",correct:true},
+{text:"d) Đây là một trong những nội dung cải cách của vua Lê Thánh Tông thời Lê Sơ.",correct:true}
+]
+}
+
+];
+
+shuffle(mcq);
+shuffle(tfQuestions);
+
+const mcqForm=document.getElementById("mcqForm");
+
+mcq.forEach((q,index)=>{
+
+shuffle(q.answers);
+
+let div=document.createElement("div");
+
+div.className="question";
+
+let html=`<h3>${q.question}</h3>`;
+
+q.answers.forEach(ans=>{
+
+html += `
+<label>
+<input type="radio" name="mcq${index}" value="${ans.correct}">
+${ans.text}
+</label>
+`;
+
+});
+
+div.innerHTML=html;
+
+mcqForm.appendChild(div);
+
+});
+
+const tfContainer=document.getElementById("tfContainer");
+
+tfQuestions.forEach((q,index)=>{
+
+shuffle(q.answers);
+
+let html=`
+
+<div class="question">
+
+<div class="title">
+Câu ${q.id}
+</div>
+
+<div class="quote">
+${q.quote}
+</div>
+`;
+
+q.answers.forEach((a,i)=>{
+
+html += `
+
+<div class="answer-row">
+
+<div class="answer-text">
+${a.text}
+</div>
+
+<div class="buttons">
+
+<label>
+<input type="radio" name="tf${index}_${i}" value="true">
+<div class="btn">Đúng</div>
+</label>
+
+<label>
+<input type="radio" name="tf${index}_${i}" value="false">
+<div class="btn">Sai</div>
+</label>
+
+</div>
+
+</div>
+`;
+
+});
+
+html += `</div>`;
+
+tfContainer.innerHTML += html;
+
+});
+
+function submitQuiz(){
+
+if(window.submitted) return;
+
+window.submitted = true;
+
+let score=0;
+let total=0;
+
+mcq.forEach((q,index)=>{
+
+total++;
+
+const answers=document.getElementsByName(`mcq${index}`);
+
+answers.forEach(ans=>{
+
+if(ans.checked){
+
+if(ans.value==="true"){
+
+score++;
+ans.parentElement.classList.add("correct");
+
+}else{
+
+ans.parentElement.classList.add("wrong");
+
+}
+
+}
+
+if(ans.value==="true"){
+
+ans.parentElement.classList.add("correct");
+
+}
+
+});
+
+});
+
+tfQuestions.forEach((q,index)=>{
+
+q.answers.forEach((a,i)=>{
+
+total++;
+
+const selected=
+document.querySelector(`input[name="tf${index}_${i}"]:checked`);
+
+const labels=
+document.querySelectorAll(`input[name="tf${index}_${i}"]`);
+
+labels.forEach(lb=>{
+
+const userAnswer=lb.value==="true";
+
+if(userAnswer===a.correct){
+
+lb.nextElementSibling.classList.add("correct");
+
+}
+
+});
+
+if(selected){
+
+const userAnswer=
+selected.value==="true";
+
+const button=
+selected.nextElementSibling;
+
+if(userAnswer===a.correct){
+
+button.classList.add("correct");
+score++;
+
+}else{
+
+button.classList.add("wrong");
+
+}
+
+}
+
+});
+
+});
+
+document.getElementById("result").innerHTML=
+`🎯 Bạn đúng ${score}/${total} ý`;
+
+window.scrollTo({
+top:document.body.scrollHeight,
+behavior:"smooth"
+});
+
+}
+
+let time=45*60;
+
+const timer=document.getElementById("timer");
+
+const countdown=setInterval(()=>{
+
+let minutes=Math.floor(time/60);
+let seconds=time%60;
+
+if(seconds<10){
+seconds="0"+seconds;
+}
+
+timer.innerHTML=`⏰ ${minutes}:${seconds}`;
+
+time--;
+
+if(time<0){
+
+clearInterval(countdown);
+
+alert("Hết giờ!");
+
+submitQuiz();
+
+}
+
+},1000);
+
+</script>
+
+</body>
+</html>
